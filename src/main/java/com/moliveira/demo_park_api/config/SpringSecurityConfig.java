@@ -1,6 +1,5 @@
 package com.moliveira.demo_park_api.config;
 
-import com.moliveira.demo_park_api.exception.PasswordInvalidException;
 import com.moliveira.demo_park_api.jwt.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
