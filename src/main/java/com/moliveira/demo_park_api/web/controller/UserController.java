@@ -73,6 +73,7 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
             })
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT') AND (#id == authentication.principal.id)")
     public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto dto) {
         User responseUser = userService.changePassword(id, dto.getActualPassword(), dto.getNewPassword(), dto.getConfirmedPassword());
         return ResponseEntity.noContent().build();
@@ -85,6 +86,7 @@ public class UserController {
                             array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class))))
             })
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDto>> getAll() {
         List<User> responseUser = userService.findAll();
         return ResponseEntity.ok(UserMapper.toListDto(responseUser));
