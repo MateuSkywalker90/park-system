@@ -268,7 +268,7 @@ public class UserIT {
     }
 
     @Test
-    public void lisUsers_WithAnyParams_ReturnUsersListWithStatus200() {
+    public void listUsers_WithAnyParams_ReturnUsersListWithStatus200() {
         List<UserResponseDto> responseBody = testClient
                 .get()
                 .uri("/api/v1/users")
