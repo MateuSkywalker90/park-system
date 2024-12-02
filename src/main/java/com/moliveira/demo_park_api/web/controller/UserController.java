@@ -68,13 +68,10 @@ public class UserController {
     @Operation(summary = "Update user password", description = "Request needs a Bearer Token. Restricted access to ADMIN|CLIENT",
             security = @SecurityRequirement(name = "security"),
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Password successfully updated",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))),
+                    @ApiResponse(responseCode = "204", description = "Password successfully updated"),
                     @ApiResponse(responseCode = "400", description = "Wrong password",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "403", description = "User don't have authorization to access this resource",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "User not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "422", description = "Invalid fields",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
@@ -82,7 +79,7 @@ public class UserController {
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT') AND (#id == authentication.principal.id)")
     public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto dto) {
-        User responseUser = userService.changePassword(id, dto.getActualPassword(), dto.getNewPassword(), dto.getConfirmedPassword());
+        userService.changePassword(id, dto.getActualPassword(), dto.getNewPassword(), dto.getConfirmedPassword());
         return ResponseEntity.noContent().build();
     }
 
