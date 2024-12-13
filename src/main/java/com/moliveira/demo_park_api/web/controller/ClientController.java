@@ -18,10 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -51,5 +48,11 @@ public class ClientController {
         client.setUser(userService.searchById(userDetails.getId()));
         clientService.save(client);
         return  ResponseEntity.status(201).body(ClientMapper.toDto(client));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientResponseDto> getById(@PathVariable Long id) {
+        Client client = clientService.findById(id);
+        return ResponseEntity.ok(ClientMapper.toDto(client));
     }
 }

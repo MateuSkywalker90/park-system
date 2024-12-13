@@ -2,6 +2,7 @@ package com.moliveira.demo_park_api.service;
 
 import com.moliveira.demo_park_api.entity.Client;
 import com.moliveira.demo_park_api.exception.CpfUniqueViolationException;
+import com.moliveira.demo_park_api.exception.EntityNotFoundException;
 import com.moliveira.demo_park_api.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,5 +23,12 @@ public class ClientService {
             throw new CpfUniqueViolationException(
                     String.format("CPF '%s' already registered in the system", client.getCpf()));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Client findById(Long id) {
+        return clientRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Client id=%s not found.", id))
+        );
     }
 }
