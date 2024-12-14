@@ -28,7 +28,8 @@ public class ClientController {
     private final ClientService clientService;
     private final UserService userService;
 
-    @Operation(summary = "Create a new client", description = "Resource to create and bind a new client to a system user",
+    @Operation(summary = "Create a new client", description = "Resource to create and bind a new client to a system user. " +
+            "Access required Role='CLIENT'",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Client successfully created",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
@@ -36,7 +37,7 @@ public class ClientController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "422", description = "Resource not processed, data is invalid",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "403", description = "Resource not allowed to ADMIN user",
+                    @ApiResponse(responseCode = "403", description = "Resource not allowed to ADMIN role",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
                     )
             })
@@ -50,7 +51,19 @@ public class ClientController {
         return  ResponseEntity.status(201).body(ClientMapper.toDto(client));
     }
 
+    @Operation(summary = "Find a client by id", description = "Resource to find a client registered in the system. " +
+            "Access required Role='ADMIN'",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Client successfully found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Client not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource not allowed to CLIENT role",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+                    )
+            })
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ClientResponseDto> getById(@PathVariable Long id) {
         Client client = clientService.findById(id);
         return ResponseEntity.ok(ClientMapper.toDto(client));
