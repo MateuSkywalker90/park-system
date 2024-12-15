@@ -11,14 +11,20 @@ import com.moliveira.demo_park_api.web.dto.PageableDto;
 import com.moliveira.demo_park_api.web.dto.UserResponseDto;
 import com.moliveira.demo_park_api.web.dto.mapper.ClientMapper;
 import com.moliveira.demo_park_api.web.dto.mapper.PageableMapper;
+import com.moliveira.demo_park_api.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,6 +43,7 @@ public class ClientController {
 
     @Operation(summary = "Create a new client", description = "Resource to create and bind a new client to a system user. " +
             "Access required Role='CLIENT'",
+            security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "201", description = "Client successfully created",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
@@ -60,6 +67,7 @@ public class ClientController {
 
     @Operation(summary = "Find a client by id", description = "Resource to find a client registered in the system. " +
             "Access required Role='ADMIN'",
+            security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Client successfully found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
@@ -76,9 +84,38 @@ public class ClientController {
         return ResponseEntity.ok(ClientMapper.toDto(client));
     }
 
+    @Operation(summary = "Return a client list",
+            description = "Resource to get all client in the database. Access required Role='CLIENT'",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "0")),
+                            description = "Represents the returned page"
+                    ),
+                    @Parameter(in = ParameterIn.QUERY, name = "size",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "20")),
+                            description = "Represents the total number of elements on the page"
+                    ),
+                    @Parameter(in = ParameterIn.QUERY, name = "sort", hidden = true,
+                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,asc")),
+                            description = "Represents the order of elements on the page"
+                    ),
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource returned with success",
+                        content = @Content(mediaType = " application/json;charset=UTF-8",
+                            schema = @Schema(implementation = ClientResponseDto.class))
+                    ),
+                    @ApiResponse(responseCode = "403", description = "Resource not allowed to CLIENT role",
+                            content = @Content(mediaType = " application/json;charset=UTF-8",
+                                schema = @Schema(implementation = ErrorMessage.class)
+                            )
+                    )
+            }
+    )
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PageableDto> getAll(Pageable pageable) {
+    public ResponseEntity<PageableDto> getAll(@Parameter(hidden = true) @PageableDefault(size = 5, sort = {"name"}) Pageable pageable) {
         Page<ClientProjection> clients = clientService.findAll(pageable);
         return ResponseEntity.ok(PageableMapper.toDto(clients));
     }
