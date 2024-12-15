@@ -62,7 +62,7 @@ public class ClientController {
         Client client = ClientMapper.toClient(dto);
         client.setUser(userService.searchById(userDetails.getId()));
         clientService.save(client);
-        return  ResponseEntity.status(201).body(ClientMapper.toDto(client));
+        return ResponseEntity.status(201).body(ClientMapper.toDto(client));
     }
 
     @Operation(summary = "Find a client by id", description = "Resource to find a client registered in the system. " +
@@ -103,19 +103,22 @@ public class ClientController {
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Resource returned with success",
-                        content = @Content(mediaType = " application/json;charset=UTF-8",
-                            schema = @Schema(implementation = ClientResponseDto.class))
+                            content = @Content(mediaType = " application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ClientResponseDto.class))
                     ),
                     @ApiResponse(responseCode = "403", description = "Resource not allowed to CLIENT role",
                             content = @Content(mediaType = " application/json;charset=UTF-8",
-                                schema = @Schema(implementation = ErrorMessage.class)
+                                    schema = @Schema(implementation = ErrorMessage.class)
                             )
                     )
             }
     )
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PageableDto> getAll(@Parameter(hidden = true) @PageableDefault(size = 5, sort = {"name"}) Pageable pageable) {
+    public ResponseEntity<PageableDto> getAll(@Parameter(hidden = true) @PageableDefault(
+            size = 5,
+            sort = {"name"}
+    ) Pageable pageable) {
         Page<ClientProjection> clients = clientService.findAll(pageable);
         return ResponseEntity.ok(PageableMapper.toDto(clients));
     }
