@@ -2,12 +2,15 @@ package com.moliveira.demo_park_api.web.controller;
 
 import com.moliveira.demo_park_api.entity.Client;
 import com.moliveira.demo_park_api.jwt.JwtUserDetails;
+import com.moliveira.demo_park_api.repository.projection.ClientProjection;
 import com.moliveira.demo_park_api.service.ClientService;
 import com.moliveira.demo_park_api.service.UserService;
 import com.moliveira.demo_park_api.web.dto.ClientCreateDto;
 import com.moliveira.demo_park_api.web.dto.ClientResponseDto;
+import com.moliveira.demo_park_api.web.dto.PageableDto;
 import com.moliveira.demo_park_api.web.dto.UserResponseDto;
 import com.moliveira.demo_park_api.web.dto.mapper.ClientMapper;
+import com.moliveira.demo_park_api.web.dto.mapper.PageableMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -75,8 +78,8 @@ public class ClientController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Client>> getAll(Pageable pageable) {
-        Page<Client> clients = clientService.findAll(pageable);
-        return ResponseEntity.ok(clients);
+    public ResponseEntity<PageableDto> getAll(Pageable pageable) {
+        Page<ClientProjection> clients = clientService.findAll(pageable);
+        return ResponseEntity.ok(PageableMapper.toDto(clients));
     }
 }

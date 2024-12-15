@@ -4,6 +4,7 @@ import com.moliveira.demo_park_api.entity.Client;
 import com.moliveira.demo_park_api.exception.CpfUniqueViolationException;
 import com.moliveira.demo_park_api.exception.EntityNotFoundException;
 import com.moliveira.demo_park_api.repository.ClientRepository;
+import com.moliveira.demo_park_api.repository.projection.ClientProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Client> findAll(Pageable pageable) {
-        return clientRepository.findAll(pageable);
+    public Page<ClientProjection> findAll(Pageable pageable) {
+        return clientRepository.findAllPageable(pageable);
     }
 }
