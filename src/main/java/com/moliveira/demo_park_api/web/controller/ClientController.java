@@ -14,11 +14,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -67,5 +71,12 @@ public class ClientController {
     public ResponseEntity<ClientResponseDto> getById(@PathVariable Long id) {
         Client client = clientService.findById(id);
         return ResponseEntity.ok(ClientMapper.toDto(client));
+    }
+
+    @GetMapping()
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<Client>> getAll(Pageable pageable) {
+        Page<Client> clients = clientService.findAll(pageable);
+        return ResponseEntity.ok(clients);
     }
 }
