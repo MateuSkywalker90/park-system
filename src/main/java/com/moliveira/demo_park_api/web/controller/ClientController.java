@@ -123,6 +123,22 @@ public class ClientController {
         return ResponseEntity.ok(PageableMapper.toDto(clients));
     }
 
+    @Operation(summary = "Return the data of authenticated client",
+            description = "Resource to find the data of a client registered in the system. " +
+                    "Access required Role='CLIENT'",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource returned with success",
+                            content = @Content(mediaType = " application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ClientResponseDto.class))
+                    ),
+                    @ApiResponse(responseCode = "403", description = "Resource not allowed to ADMIN role",
+                            content = @Content(mediaType = " application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class)
+                            )
+                    )
+            }
+    )
     @GetMapping("/details")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<ClientResponseDto> getDetails(@AuthenticationPrincipal JwtUserDetails userDetails) {
