@@ -20,7 +20,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "space")
+@Table(name = "spaces")
 @EntityListeners(AuditingEntityListener.class)
 public class ParkingSpace implements Serializable {
 

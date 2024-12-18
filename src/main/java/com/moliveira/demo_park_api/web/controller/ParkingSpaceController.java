@@ -69,7 +69,7 @@ public class ParkingSpaceController {
                     @ApiResponse(responseCode = "404", description = "Parking space not found",
                             content = @Content(mediaType = " application/json;charset=UTF-8",
                                     schema = @Schema(implementation = ErrorMessage.class))),
-                    @ApiResponse(responseCode = "403", description = "Resource not allowed for CLIENT role",
+                    @ApiResponse(responseCode = "403", description = "Recurso não permito ao perfil de CLIENTE",
                             content = @Content(mediaType = " application/json;charset=UTF-8",
                                     schema = @Schema(implementation = ErrorMessage.class))
                     )
