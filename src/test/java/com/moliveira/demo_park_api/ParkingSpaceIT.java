@@ -29,4 +29,49 @@ public class ParkingSpaceIT {
                 .expectStatus().isCreated()
                 .expectHeader().exists(HttpHeaders.LOCATION);
     }
+
+    @Test
+    public void createParkingSpace_WithExistentCode_ReturnErrorMessageWithStatus409() {
+        testClient
+                .post()
+                .uri("/api/v1/parking-spaces")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                .bodyValue(new ParkingSpaceCreateDto("A-01", "FREE"))
+                .exchange()
+                .expectStatus().isEqualTo(409)
+                .expectBody()
+                .jsonPath("status").isEqualTo(409)
+                .jsonPath("method").isEqualTo("POST")
+                .jsonPath("path").isEqualTo("/api/v1/parking-spaces");
+    }
+
+    @Test
+    public void createParkingSpace_WithInvalidData_ReturnErrorMessageWithStatus422() {
+        testClient
+                .post()
+                .uri("/api/v1/parking-spaces")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                .bodyValue(new ParkingSpaceCreateDto("", ""))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody()
+                .jsonPath("status").isEqualTo(422)
+                .jsonPath("method").isEqualTo("POST")
+                .jsonPath("path").isEqualTo("/api/v1/parking-spaces");
+
+        testClient
+                .post()
+                .uri("/api/v1/parking-spaces")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                .bodyValue(new ParkingSpaceCreateDto("A-501", "UNKNOWN"))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody()
+                .jsonPath("status").isEqualTo(422)
+                .jsonPath("method").isEqualTo("POST")
+                .jsonPath("path").isEqualTo("/api/v1/parking-spaces");
+    }
 }
