@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -19,9 +20,9 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "parking_space")
+@Table(name = "space")
 @EntityListeners(AuditingEntityListener.class)
-public class ParkingSpace {
+public class ParkingSpace implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,8 @@ public class ParkingSpace {
     @Column(name = "code", nullable = false, unique = true, length = 4)
     private String code;
 
-    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private ParkingSpaceStatus status;
 
     @CreatedDate
@@ -56,13 +57,14 @@ public class ParkingSpace {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ParkingSpace that = (ParkingSpace) o;
-        return Objects.equals(id, that.id);
+        ParkingSpace parkingSpace = (ParkingSpace) o;
+        return Objects.equals(id, parkingSpace.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(id);
     }
 }
