@@ -102,4 +102,34 @@ public class ParkingSpaceIT {
                 .jsonPath("method").isEqualTo("GET")
                 .jsonPath("path").isEqualTo("/api/v1/parking-spaces/A-10");
     }
+
+    @Test
+    public void createParkingSpace_WithUserWithoutPermission_ReturnErrorMessageWithStatus403() {
+        testClient
+                .post()
+                .uri("/api/v1/parking-spaces")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
+                .bodyValue(new ParkingSpaceCreateDto("A-05", "OCCUPIED"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo(403)
+                .jsonPath("method").isEqualTo("POST")
+                .jsonPath("path").isEqualTo("/api/v1/parking-spaces");
+    }
+
+    @Test
+    public void findParkingSpace_WithUserWithoutPermission_ReturnErrorMessageWithStatus403() {
+        testClient
+                .get()
+                .uri("/api/v1/parking-spaces/{code}", "A-01")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo(403)
+                .jsonPath("method").isEqualTo("GET")
+                .jsonPath("path").isEqualTo("/api/v1/parking-spaces/A-01");
+    }
 }
