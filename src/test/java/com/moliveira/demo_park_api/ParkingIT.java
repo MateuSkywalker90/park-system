@@ -119,4 +119,51 @@ public class ParkingIT {
                 .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in")
                 .jsonPath("method").isEqualTo("POST");
     }
+
+    @Test
+    public void findCheckIn_WithAdminRole_ReturnDataWithStatus200() {
+        testClient.get()
+                .uri("/api/v1/parking-lots/check-in/{receipt}", "20230313-101200")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("licensePlate").isEqualTo("CAD-4679")
+                .jsonPath("brand").isEqualTo("FIAT")
+                .jsonPath("model").isEqualTo("PALIO")
+                .jsonPath("color").isEqualTo("GREEN")
+                .jsonPath("clientCpf").isEqualTo("88617905000")
+                .jsonPath("receipt").isEqualTo("20230313-101200")
+                .jsonPath("entryDate").isEqualTo("2023-03-13 10:13:56")
+                .jsonPath("parkingSpaceCode").isEqualTo("A-01");
+    }
+
+    @Test
+    public void findCheckIn_WithClientRole_ReturnDataWithStatus200() {
+        testClient.get().uri("/api/v1/parking-lots/check-in/{receipt}", "20230313-101200")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bob@email.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("licensePlate").isEqualTo("CAD-4679")
+                .jsonPath("brand").isEqualTo("FIAT")
+                .jsonPath("model").isEqualTo("PALIO")
+                .jsonPath("color").isEqualTo("GREEN")
+                .jsonPath("clientCpf").isEqualTo("88617905000")
+                .jsonPath("receipt").isEqualTo("20230313-101200")
+                .jsonPath("entryDate").isEqualTo("2023-03-13 10:13:56")
+                .jsonPath("parkingSpaceCode").isEqualTo("A-01");
+    }
+
+    @Test
+    public void findCheckIn_WithNonExistentReceipt_ReturnErrorStatus404() {
+        testClient.get().uri("/api/v1/parking-lots/check-in/{receipt}", "20230313-999999")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bob@email.com", "123456"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo("404")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in/20230313-999999")
+                .jsonPath("method").isEqualTo("GET");
+    }
 }
