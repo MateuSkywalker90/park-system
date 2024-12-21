@@ -3,7 +3,10 @@ package com.moliveira.demo_park_api.service;
 import com.moliveira.demo_park_api.entity.CustomerVacancy;
 import com.moliveira.demo_park_api.exception.EntityNotFoundException;
 import com.moliveira.demo_park_api.repository.CustomerVacancyRepository;
+import com.moliveira.demo_park_api.repository.projection.CustomerVacancyProjection;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,5 +33,10 @@ public class CustomerVacancyService {
     @Transactional(readOnly = true)
     public long getTotalTimesParked(String cpf) {
         return customerVacancyRepository.countByClientCpfAndEntryDateIsNotNull(cpf);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CustomerVacancyProjection> findByClientCpf(String cpf, Pageable pageable) {
+        return customerVacancyRepository.findAllByClientCpf(cpf, pageable);
     }
 }
