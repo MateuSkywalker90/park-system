@@ -79,4 +79,44 @@ public class ParkingIT {
                 .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in")
                 .jsonPath("method").isEqualTo("POST");
     }
+
+    @Test
+    public void createCheckIn_WithNonExistentCpf_ReturnErrorStatus404() {
+        ParkingCreateDto createDto = ParkingCreateDto.builder()
+                .licensePlate("WER-1234").brand("FIAT").model("UNO 2021")
+                .color("RED").clientCpf("59177724011")
+                .build();
+
+        testClient.post().uri("/api/v1/parking-lots/check-in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                .bodyValue(createDto)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo("404")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in")
+                .jsonPath("method").isEqualTo("POST");
+    }
+
+    @Sql(scripts = "/sql/parking/parking-space-occupied-insert.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/parking/parking-space-occupied-delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Test
+    public void createCheckIn_WithOccupiedParkingSpaces_ReturnErrorStatus404() {
+        ParkingCreateDto createDto = ParkingCreateDto.builder()
+                .licensePlate("WER-1234").brand("FIAT").model("UNO 2021")
+                .color("RED").clientCpf("88599201085")
+                .build();
+
+        testClient.post().uri("/api/v1/parking-lots/check-in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                .bodyValue(createDto)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo("404")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in")
+                .jsonPath("method").isEqualTo("POST");
+    }
 }
