@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.br.CPF;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerVacancyCreateDto {
+public class ParkingCreateDto {
 
     @NotBlank
     @Size(min = 8, max = 8)

@@ -2,8 +2,8 @@ package com.moliveira.demo_park_api.web.controller;
 
 import com.moliveira.demo_park_api.entity.CustomerVacancy;
 import com.moliveira.demo_park_api.service.ParkingService;
-import com.moliveira.demo_park_api.web.dto.CustomerVacancyCreateDto;
-import com.moliveira.demo_park_api.web.dto.CustomerVacancyResponseDto;
+import com.moliveira.demo_park_api.web.dto.ParkingCreateDto;
+import com.moliveira.demo_park_api.web.dto.ParkingResponseDto;
 import com.moliveira.demo_park_api.web.dto.mapper.CustomerVacancyMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +26,10 @@ public class ParkingController {
 
     @PostMapping("/check-in")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CustomerVacancyResponseDto> checkIn(@RequestBody @Valid CustomerVacancyCreateDto dto) {
+    public ResponseEntity<ParkingResponseDto> checkIn(@RequestBody @Valid ParkingCreateDto dto) {
         CustomerVacancy customerVacancy = CustomerVacancyMapper.toCustomerVacancy(dto);
         parkingService.checkIn(customerVacancy);
-        CustomerVacancyResponseDto responseDto = CustomerVacancyMapper.toDto(customerVacancy);
+        ParkingResponseDto responseDto = CustomerVacancyMapper.toDto(customerVacancy);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri().path("/{receipt}")
                 .buildAndExpand(customerVacancy.getReceipt())
