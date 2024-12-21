@@ -33,4 +33,10 @@ public class ParkingService {
 
         return customerVacancyService.save(customerVacancy);
     }
+
+    @Transactional
+    public CustomerVacancy checkOut(String receipt) {
+        //Implement method
+        return null;
+    }
 }
