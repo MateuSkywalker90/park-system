@@ -41,4 +41,42 @@ public class ParkingIT {
                 .jsonPath("entryDate").exists()
                 .jsonPath("parkingSpaceCode").exists();
     }
+
+    @Test
+    public void createCheckIn_WithRoleClient_ReturnErrorStatus403() {
+        ParkingCreateDto createDto = ParkingCreateDto.builder()
+                .licensePlate("WER-1234").brand("FIAT").model("UNO 2021")
+                .color("RED").clientCpf("88599201085")
+                .build();
+
+        testClient.post().uri("/api/v1/parking-lots/check-in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
+                .bodyValue(createDto)
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in")
+                .jsonPath("method").isEqualTo("POST");
+    }
+
+    @Test
+    public void createCheckIn_WithInvalidData_ReturnErrorStatus422() {
+        ParkingCreateDto createDto = ParkingCreateDto.builder()
+                .licensePlate("").brand("").model("")
+                .color("").clientCpf("")
+                .build();
+
+        testClient.post().uri("/api/v1/parking-lots/check-in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
+                .bodyValue(createDto)
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody()
+                .jsonPath("status").isEqualTo("422")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in")
+                .jsonPath("method").isEqualTo("POST");
+    }
 }
