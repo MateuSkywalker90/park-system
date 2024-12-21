@@ -26,4 +26,9 @@ public class CustomerVacancyService {
                 )
         );
     }
+
+    @Transactional(readOnly = true)
+    public long getTotalTimesParked(String cpf) {
+        return customerVacancyRepository.countByClientCpfAndEntryDateIsNotNull(cpf);
+    }
 }

@@ -8,6 +8,8 @@ import com.moliveira.demo_park_api.web.dto.ParkingResponseDto;
 import com.moliveira.demo_park_api.web.dto.mapper.CustomerVacancyMapper;
 import com.moliveira.demo_park_api.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +26,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
+
 @Tag(name = "Parking", description = "Contains all parking resource operations such as creating, reading, and editing.")
 @RequiredArgsConstructor
 @RestController
@@ -37,7 +41,7 @@ public class ParkingController {
             "Requisition needs a bearer token. Access allowed to 'ADMIN' role",
             security = @SecurityRequirement(name = "security"),
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Resource created successfully",
+                    @ApiResponse(responseCode = "201", description = "Resource successfully created",
                             headers = @Header(name = HttpHeaders.LOCATION, description = "URL to access the created resource"),
                             content = @Content(mediaType = "application/json;charset=UTF-8",
                                     schema = @Schema(implementation = ParkingResponseDto.class))),
@@ -66,6 +70,20 @@ public class ParkingController {
         return ResponseEntity.created(location).body(responseDto);
     }
 
+    @Operation(summary = "Return a receipt information", description = "feature to search for an existing receipt in the system. "+
+            "Requisition needs a bearer token.",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = PATH, name = "receipt", description = "Number of receipt created by check-in")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource located successfully",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ParkingResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Receipt number not found.",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
+            })
     @GetMapping("/check-in/{receipt}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
     public ResponseEntity<ParkingResponseDto> getByReceipt(@PathVariable String receipt) {
@@ -74,6 +92,24 @@ public class ParkingController {
         return ResponseEntity.ok(dto);
     }
 
+    @Operation(summary = "Check-out Operation", description = "Resource to register the departure date of a vehicle in the parking. " +
+            "Requisition needs a bearer token. Access allowed to 'ADMIN' role",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = PATH, name = "receipt", description = "Number of receipt created by check-in")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource successfully updated",
+                           content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ParkingResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Invalid number of receipt or " +
+                            "the vehicle has already left the parking lot.",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource not allowed to CLIENT role",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
+            })
     @PutMapping("/check-out/{receipt}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ParkingResponseDto> checkOut(@PathVariable String receipt) {

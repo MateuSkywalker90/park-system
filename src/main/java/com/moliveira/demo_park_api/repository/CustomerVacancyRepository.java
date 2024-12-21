@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface CustomerVacancyRepository extends JpaRepository<CustomerVacancy, Long> {
 
     Optional<CustomerVacancy> findByReceiptAndDepartureDateIsNull(String receipt);
+
+    long countByClientCpfAndEntryDateIsNotNull(String cpf);
 }
