@@ -15,7 +15,7 @@ insert into SPACES (id, code, status) values (400, 'A-04', 'FREE');
 insert into SPACES (id, code, status) values (500, 'A-05', 'FREE');
 
 insert into CUSTOMER_VACANCY (receipt_number, license_plate, brand, model, color, entry_date, id_client, id_space)
-    values ('20230313-101200', 'CAD-4679', 'FIAT', 'PALIO', 'GREEN', '2023-03-13 10:13:56', 20, 100);
+    values ('20241013-101200', 'CAD-4679', 'FIAT', 'PALIO', 'GREEN', '2024-10-13 10:13:56', 20, 100);
 insert into CUSTOMER_VACANCY (receipt_number, license_plate, brand, model, color, entry_date, id_client, id_space)
     values ('20240207-113500', 'KLP-7723', 'FORD', 'KA 2022', 'SILVER', '2024-02-07 11:36:56', 10, 200);
 insert into CUSTOMER_VACANCY (receipt_number, license_plate, brand, model, color, entry_date, id_client, id_space)
