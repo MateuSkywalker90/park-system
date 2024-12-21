@@ -1,6 +1,7 @@
 package com.moliveira.demo_park_api.web.controller;
 
 import com.moliveira.demo_park_api.entity.CustomerVacancy;
+import com.moliveira.demo_park_api.service.CustomerVacancyService;
 import com.moliveira.demo_park_api.service.ParkingService;
 import com.moliveira.demo_park_api.web.dto.ParkingCreateDto;
 import com.moliveira.demo_park_api.web.dto.ParkingResponseDto;
@@ -18,10 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -33,6 +31,7 @@ import java.net.URI;
 public class ParkingController {
 
     private final ParkingService parkingService;
+    private final CustomerVacancyService customerVacancyService;
 
     @Operation(summary = "Check-in Operation", description = "Resource to register the entry date of a vehicle in the parking. " +
             "Requisition needs a bearer token. Access allowed to 'ADMIN' role",
@@ -65,5 +64,13 @@ public class ParkingController {
                 .buildAndExpand(customerVacancy.getReceipt())
                 .toUri();
         return ResponseEntity.created(location).body(responseDto);
+    }
+
+    @GetMapping("/check-in/{receipt}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
+    public ResponseEntity<ParkingResponseDto> getByReceipt(@PathVariable String receipt) {
+        CustomerVacancy customerVacancy = customerVacancyService.findByReceipt(receipt);
+        ParkingResponseDto dto = CustomerVacancyMapper.toDto(customerVacancy);
+        return ResponseEntity.ok(dto);
     }
 }
