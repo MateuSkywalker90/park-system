@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,6 +35,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
 
 @Tag(name = "Parking", description = "Contains all parking resource operations such as creating, reading, and editing.")
 @RequiredArgsConstructor
@@ -125,6 +127,32 @@ public class ParkingController {
         return ResponseEntity.ok(dto);
     }
 
+    @Operation(summary = "Find customer parking records by CPF", description = "Resource to find customer parking records by CPF. " +
+            "Requisition needs a bearer token. Access allowed to 'ADMIN' role",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = PATH, name = "cpf", description = "CPF number for the client to be consulted",
+                            required = true
+                    ),
+                    @Parameter(in = QUERY, name = "page", description = "Represents the returned page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "0"))
+                    ),
+                    @Parameter(in = QUERY, name = "size", description = "Represents total of elements in the page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "5"))
+                    ),
+                    @Parameter(in = QUERY, name = "sort", description = "Represents the content order by 'entryDate, asc'.",
+                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "entryDate,asc")),
+                            hidden = true
+                    ),
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource successfully located",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ParkingResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource not allowed to CLIENT role",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
+            })
     @GetMapping("/cpf/{cpf}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageableDto> getAllParkingLotsByCpf(@PathVariable String cpf,
