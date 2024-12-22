@@ -155,10 +155,8 @@ public class ParkingController {
             })
     @GetMapping("/cpf/{cpf}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PageableDto> getAllParkingLotsByCpf(@PathVariable String cpf,
-                                                              @PageableDefault(size = 5, sort = "entryDate",
-                                                                      direction = Sort.Direction.ASC)
-                                                              Pageable pageable) {
+    public ResponseEntity<PageableDto> getAllParkingLotsByCpf(@PathVariable String cpf, @Parameter(hidden = true)
+    @PageableDefault(size = 5, sort = "entryDate", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<CustomerVacancyProjection> projection = customerVacancyService.findByClientCpf(cpf, pageable);
         PageableDto dto = PageableMapper.toDto(projection);
         return ResponseEntity.ok(dto);

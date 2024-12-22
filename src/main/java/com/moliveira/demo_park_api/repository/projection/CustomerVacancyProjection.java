@@ -27,7 +27,7 @@ public interface CustomerVacancyProjection {
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
      LocalDateTime getDepartureDate();
 
-     String getParkingSpaceCode();
+     String getSpaceCode();
 
      BigDecimal getAmount();
 
