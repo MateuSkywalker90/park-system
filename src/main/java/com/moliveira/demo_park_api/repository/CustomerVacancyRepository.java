@@ -15,4 +15,6 @@ public interface CustomerVacancyRepository extends JpaRepository<CustomerVacancy
     long countByClientCpfAndEntryDateIsNotNull(String cpf);
 
     Page<CustomerVacancyProjection> findAllByClientCpf(String cpf, Pageable pageable);
+
+    Page<CustomerVacancyProjection> findAllByClientUserId(Long id, Pageable pageable);
 }

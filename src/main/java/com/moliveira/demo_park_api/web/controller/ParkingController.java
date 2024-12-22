@@ -1,6 +1,7 @@
 package com.moliveira.demo_park_api.web.controller;
 
 import com.moliveira.demo_park_api.entity.CustomerVacancy;
+import com.moliveira.demo_park_api.jwt.JwtUserDetails;
 import com.moliveira.demo_park_api.repository.projection.CustomerVacancyProjection;
 import com.moliveira.demo_park_api.service.CustomerVacancyService;
 import com.moliveira.demo_park_api.service.ParkingService;
@@ -29,6 +30,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -158,6 +160,39 @@ public class ParkingController {
     public ResponseEntity<PageableDto> getAllParkingLotsByCpf(@PathVariable String cpf, @Parameter(hidden = true)
     @PageableDefault(size = 5, sort = "entryDate", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<CustomerVacancyProjection> projection = customerVacancyService.findByClientCpf(cpf, pageable);
+        PageableDto dto = PageableMapper.toDto(projection);
+        return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "Find customer parking records by user id", description = "Resource to find customer parking records by his user id. " +
+            "Requisition needs a bearer token. Access allowed to 'CLIENT' role",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = QUERY, name = "page", description = "Represents the returned page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "0"))
+                    ),
+                    @Parameter(in = QUERY, name = "size", description = "Represents total of elements in the page",
+                            content = @Content(schema = @Schema(type = "integer", defaultValue = "5"))
+                    ),
+                    @Parameter(in = QUERY, name = "sort", description = "Represents the content order by 'entryDate, asc'.",
+                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "entryDate,asc")),
+                            hidden = true
+                    ),
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource successfully located",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ParkingResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource not allowed to ADMIN role",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
+            })
+    @GetMapping
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageableDto> getAllClientParkingLots(@AuthenticationPrincipal JwtUserDetails user,
+                                                               @PageableDefault(size = 5, sort = "entryDate",
+                                                               direction = Sort.Direction.ASC) Pageable pageable) {
+        Page<CustomerVacancyProjection> projection = customerVacancyService.findAllByClientId(user.getId(), pageable);
         PageableDto dto = PageableMapper.toDto(projection);
         return ResponseEntity.ok(dto);
     }
