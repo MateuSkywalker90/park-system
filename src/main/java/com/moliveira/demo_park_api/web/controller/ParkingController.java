@@ -33,6 +33,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -101,13 +102,27 @@ public class ParkingController {
                     @ApiResponse(responseCode = "404", description = "Receipt number not found.",
                             content = @Content(mediaType = "application/json;charset=UTF-8",
                                     schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "A client tried to read another client's receipt",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
             })
     @GetMapping("/check-in/{receipt}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
-    public ResponseEntity<ParkingResponseDto> getByReceipt(@PathVariable String receipt) {
+    public ResponseEntity<ParkingResponseDto> getByReceipt(@PathVariable String receipt,
+                                                           @AuthenticationPrincipal JwtUserDetails user) {
         CustomerVacancy customerVacancy = customerVacancyService.findByReceipt(receipt);
+        if (isAnotherClientsRecord(user, customerVacancy)) {
+            throw new AccessDeniedException("You can only access your own parking records");
+        }
         ParkingResponseDto dto = CustomerVacancyMapper.toDto(customerVacancy);
         return ResponseEntity.ok(dto);
+    }
+
+    // Admins can read any receipt; a client only the receipts of their own vehicles.
+    private boolean isAnotherClientsRecord(JwtUserDetails user, CustomerVacancy customerVacancy) {
+        boolean isClient = "ROLE_CLIENT".equals(user.getRole());
+        Long ownerUserId = customerVacancy.getClient().getUser().getId();
+        return isClient && !ownerUserId.equals(user.getId());
     }
 
     @Operation(summary = "Check-out Operation", description = "Resource to register the departure date of a vehicle in the parking. " +

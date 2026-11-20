@@ -157,6 +157,19 @@ public class ParkingIT {
     }
 
     @Test
+    public void findCheckIn_WithAnotherClientsReceipt_ReturnErrorStatus403() {
+        // Receipt 20241013-101200 belongs to bob's vehicle; bia is a different client
+        testClient.get().uri("/api/v1/parking-lots/check-in/{receipt}", "20241013-101200")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking-lots/check-in/20241013-101200")
+                .jsonPath("method").isEqualTo("GET");
+    }
+
+    @Test
     public void findCheckIn_WithNonExistentReceipt_ReturnErrorStatus404() {
         testClient.get().uri("/api/v1/parking-lots/check-in/{receipt}", "20230313-999999")
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bob@email.com", "123456"))

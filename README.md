@@ -48,7 +48,7 @@ All endpoints are under `/api/v1`. Send the token from `/auth` as `Authorization
 | `POST` | `/parking-spaces` | ADMIN | Create a parking space |
 | `GET` | `/parking-spaces/{code}` | ADMIN | Get a parking space |
 | `POST` | `/parking-lots/check-in` | ADMIN | Register a vehicle entry |
-| `GET` | `/parking-lots/check-in/{receipt}` | ADMIN, CLIENT | Get an open check-in by receipt |
+| `GET` | `/parking-lots/check-in/{receipt}` | ADMIN, or the client who owns it | Get an open check-in by receipt |
 | `PUT` | `/parking-lots/check-out/{receipt}` | ADMIN | Register the exit and charge the fee |
 | `GET` | `/parking-lots/cpf/{cpf}` | ADMIN | A customer's parking history |
 | `GET` | `/parking-lots` | CLIENT | The logged-in customer's parking history |
@@ -66,7 +66,10 @@ Java 17 · Spring Boot 3.3 (Web, Data JPA, Security, Validation) · JWT (jjwt) �
 
 **Requirements:** Java 17 and MySQL 8 on `localhost:3306` with a database named `demo_park` (credentials in `src/main/resources/application.properties`).
 
+Tokens are signed with a key read from the `JWT_SECRET` environment variable. It must be at least 32 characters; the application refuses to start without it.
+
 ```bash
+export JWT_SECRET="replace-with-a-long-random-value"
 ./mvnw spring-boot:run
 ```
 
@@ -79,7 +82,7 @@ The schema is created automatically on startup.
 ```
 
 - **Integration tests** (`*IT`) start the full application on a random port and call the real HTTP endpoints with `WebTestClient`, using an in-memory H2 database seeded per test with SQL scripts.
-- **Unit tests** (`*Test`) cover the PDF report service.
+- **Unit tests** (`*Test`) cover the PDF report service and JWT signing/validation.
 
 GitHub Actions runs everything on every push.
 
@@ -87,7 +90,5 @@ GitHub Actions runs everything on every push.
 
 Being honest about what's not done yet:
 
-- [ ] The JWT signing key is hard-coded in `JwtUtils`; it should come from an environment variable
-- [ ] Any client can look up any open check-in by receipt number; it should be limited to their own
 - [ ] The PDF report query uses MySQL-specific SQL, so it isn't covered by the H2 integration tests (the service itself is unit-tested)
 - [ ] No Docker Compose setup for MySQL yet
