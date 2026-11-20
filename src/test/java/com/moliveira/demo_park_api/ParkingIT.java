@@ -40,7 +40,7 @@ public class ParkingIT {
                 .jsonPath("clientCpf").isEqualTo("88599201085")
                 .jsonPath("receipt").exists()
                 .jsonPath("entryDate").exists()
-                .jsonPath("parkingSpaceCode").exists();
+                .jsonPath("spaceCode").exists();
     }
 
     @Test
@@ -124,7 +124,7 @@ public class ParkingIT {
     @Test
     public void findCheckIn_WithAdminRole_ReturnDataWithStatus200() {
         testClient.get()
-                .uri("/api/v1/parking-lots/check-in/{receipt}", "20230313-101200")
+                .uri("/api/v1/parking-lots/check-in/{receipt}", "20241013-101200")
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
                 .exchange()
                 .expectStatus().isOk()
@@ -134,14 +134,14 @@ public class ParkingIT {
                 .jsonPath("model").isEqualTo("PALIO")
                 .jsonPath("color").isEqualTo("GREEN")
                 .jsonPath("clientCpf").isEqualTo("88617905000")
-                .jsonPath("receipt").isEqualTo("20230313-101200")
-                .jsonPath("entryDate").isEqualTo("2023-03-13 10:13:56")
-                .jsonPath("parkingSpaceCode").isEqualTo("A-01");
+                .jsonPath("receipt").isEqualTo("20241013-101200")
+                .jsonPath("entryDate").isEqualTo("2024-10-13 10:13:56")
+                .jsonPath("spaceCode").isEqualTo("A-01");
     }
 
     @Test
     public void findCheckIn_WithClientRole_ReturnDataWithStatus200() {
-        testClient.get().uri("/api/v1/parking-lots/check-in/{receipt}", "20230313-101200")
+        testClient.get().uri("/api/v1/parking-lots/check-in/{receipt}", "20241013-101200")
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bob@email.com", "123456"))
                 .exchange()
                 .expectStatus().isOk()
@@ -151,9 +151,9 @@ public class ParkingIT {
                 .jsonPath("model").isEqualTo("PALIO")
                 .jsonPath("color").isEqualTo("GREEN")
                 .jsonPath("clientCpf").isEqualTo("88617905000")
-                .jsonPath("receipt").isEqualTo("20230313-101200")
-                .jsonPath("entryDate").isEqualTo("2023-03-13 10:13:56")
-                .jsonPath("parkingSpaceCode").isEqualTo("A-01");
+                .jsonPath("receipt").isEqualTo("20241013-101200")
+                .jsonPath("entryDate").isEqualTo("2024-10-13 10:13:56")
+                .jsonPath("spaceCode").isEqualTo("A-01");
     }
 
     @Test
@@ -183,7 +183,7 @@ public class ParkingIT {
                 .jsonPath("clientCpf").isEqualTo("88617905000")
                 .jsonPath("receipt").isEqualTo("20241013-101200")
                 .jsonPath("entryDate").isEqualTo("2024-10-13 10:13:56")
-                .jsonPath("parkingSpaceCode").isEqualTo("A-01")
+                .jsonPath("spaceCode").isEqualTo("A-01")
                 .jsonPath("departureDate").exists()
                 .jsonPath("amount").exists()
                 .jsonPath("discount").exists();
@@ -303,5 +303,16 @@ public class ParkingIT {
                 .jsonPath("status").isEqualTo("403")
                 .jsonPath("path").isEqualTo("/api/v1/parking-lots")
                 .jsonPath("method").isEqualTo("GET");
+    }
+
+    // A successful report can't be tested here: the report query uses MySQL's TIMEDIFF,
+    // which the H2 test database doesn't support. JasperServiceTest covers the service.
+    @Test
+    public void getReport_WithAdminRole_ReturnErrorStatus403() {
+        testClient.get()
+                .uri("/api/v1/parking-lots/reports")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden();
     }
 }

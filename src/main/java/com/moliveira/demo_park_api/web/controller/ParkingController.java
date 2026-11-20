@@ -208,9 +208,7 @@ public class ParkingController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Void> getReport(HttpServletResponse response, @AuthenticationPrincipal JwtUserDetails userDetails) throws IOException {
         String cpf = clientService.findUserById(userDetails.getId()).getCpf();
-        jasperService.addParams("CPF", cpf);
-
-        byte[] bytes = jasperService.generatePdf();
+        byte[] bytes = jasperService.generateParkingReport(cpf);
 
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader("Content-disposition", "inline; filename=" + System.currentTimeMillis() + ".pdf");

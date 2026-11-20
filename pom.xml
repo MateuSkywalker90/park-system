@@ -114,12 +114,6 @@
 			<artifactId>jasperreports-jdt</artifactId>
 			<version>7.0.0</version>
 		</dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
 	<build>
@@ -135,6 +129,23 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<!-- Runs the *IT integration tests during `mvn verify` (Surefire only runs *Test classes) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<!-- Same zone the application sets in main(), so tests don't depend on the machine's zone -->
+					<argLine>-Duser.timezone=America/Manaus</argLine>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

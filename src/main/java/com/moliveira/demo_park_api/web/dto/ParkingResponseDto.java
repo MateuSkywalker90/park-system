@@ -23,9 +23,9 @@ public class ParkingResponseDto {
     private String color;
     private String clientCpf;
     private String receipt;
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime entryDate;
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime departureDate;
     private String spaceCode;
     private BigDecimal amount;

@@ -39,9 +39,10 @@ public class CustomerVacancy implements Serializable {
     private LocalDateTime entryDate;
     @Column(name = "departure_date")
     private LocalDateTime departureDate;
-    @Column(name = "amount", columnDefinition = "decimal(7,2)")
+    // decimal(7,2) caps at 99,999.99, so a long stay made check-out fail with a 500
+    @Column(name = "amount", columnDefinition = "decimal(10,2)")
     private BigDecimal amount;
-    @Column(name = "discount", columnDefinition = "decimal(7,2)")
+    @Column(name = "discount", columnDefinition = "decimal(10,2)")
     private BigDecimal discount;
 
     @ManyToOne
